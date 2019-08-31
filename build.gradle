@@ -1,0 +1,69 @@
+plugins {
+    id 'java-gradle-plugin'
+    id 'maven-publish'
+}
+
+archivesBaseName = 'warp'
+group = 'io.github.daomephsta'
+version = '1.0.0'
+
+repositories {
+    jcenter()
+	maven {
+		name = "Fabric"
+		url = 'https://maven.fabricmc.net/'
+	}
+	mavenLocal()
+}
+
+dependencies {
+	implementation 'net.fabricmc:fabric-loom:0.2.5-SNAPSHOT'
+	implementation 'net.fabricmc:tiny-mappings-parser:0.1.1.8'
+	implementation 'commons-io:commons-io:2.6'
+	implementation 'com.google.guava:guava:28.0-jre'
+	implementation 'io.github.daomephsta:unpick-format-utils:2.0.0'
+	implementation 'io.github.daomephsta:unpick:2.0.0'
+	implementation 'org.ow2.asm:asm:7.0'
+	implementation 'org.ow2.asm:asm-tree:7.0'
+
+    testImplementation 'junit:junit:4.12'
+    testImplementation gradleTestKit()
+}
+
+gradlePlugin {
+    // Define the plugin
+    plugins {
+        warp {
+            id = 'io.github.daomephsta.warp'
+            implementationClass = 'io.github.daomephsta.warp.WarpPlugin'
+        }
+    }
+}
+
+// Add a source set for the functional test suite
+sourceSets {
+    functionalTest {
+    }
+}
+
+gradlePlugin.testSourceSets(sourceSets.functionalTest)
+configurations.functionalTestImplementation.extendsFrom(configurations.testImplementation)
+
+// Add a task to run the functional tests
+task functionalTest(type: Test) {
+    testClassesDirs = sourceSets.functionalTest.output.classesDirs
+    classpath = sourceSets.functionalTest.runtimeClasspath
+}
+
+check {
+    // Run the functional tests as part of `check`
+    dependsOn(tasks.functionalTest)
+}
+
+publishing {
+    publications {
+        plugin(MavenPublication) {
+            from components.java
+        }
+    }
+}
