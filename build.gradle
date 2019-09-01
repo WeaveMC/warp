@@ -4,7 +4,7 @@ plugins {
 }
 
 archivesBaseName = 'warp'
-group = 'io.github.daomephsta'
+group = 'io.github.weavemc'
 version = '1.0.0'
 
 repositories {
