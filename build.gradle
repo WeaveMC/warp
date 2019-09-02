@@ -5,7 +5,11 @@ plugins {
 
 archivesBaseName = 'warp'
 group = 'io.github.weavemc'
-version = '1.0.0'
+version = '1.0.0+build.unknown'
+def ENV = System.getenv()
+if (ENV.BUILD_NUMBER) {
+	version = "1.0.0+build.${ENV.BUILD_NUMBER}"
+}
 
 repositories {
     jcenter()
@@ -61,6 +65,18 @@ check {
 }
 
 publishing {
+	repositories {
+        if (rootProject.hasProperty('weavemc_pass')) {
+			println 'Password found. Remote maven available.'
+            maven {
+                url = 'http://deploy.modmuss50.me/'
+                credentials {
+                    username = 'weavemc'
+                    password = rootProject.getProperty('weavemc_pass')
+                }
+            }
+        }
+    }
     publications {
         plugin(MavenPublication) {
             from components.java
