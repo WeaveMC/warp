@@ -17,7 +17,6 @@ repositories {
 		name = "Fabric"
 		url = 'https://maven.fabricmc.net/'
 	}
-	mavenLocal()
 }
 
 dependencies {
@@ -25,8 +24,8 @@ dependencies {
 	implementation 'net.fabricmc:tiny-mappings-parser:0.1.1.8'
 	implementation 'commons-io:commons-io:2.6'
 	implementation 'com.google.guava:guava:28.0-jre'
-	implementation 'io.github.daomephsta:unpick-format-utils:2.0.0'
-	implementation 'io.github.daomephsta:unpick:2.0.0'
+	implementation 'io.github.weavemc:unpick-format-utils:2.0.0+build.1'
+	implementation 'io.github.weavemc:unpick:2.0.0+build.1'
 	implementation 'org.ow2.asm:asm:7.0'
 	implementation 'org.ow2.asm:asm-tree:7.0'
 
