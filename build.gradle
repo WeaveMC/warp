@@ -37,7 +37,7 @@ gradlePlugin {
     // Define the plugin
     plugins {
         warp {
-            id = 'io.github.daomephsta.warp'
+            id = 'io.github.weavemc.warp'
             implementationClass = 'io.github.daomephsta.warp.WarpPlugin'
         }
     }
