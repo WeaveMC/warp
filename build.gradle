@@ -6,10 +6,10 @@ plugins {
 
 archivesBaseName = 'warp'
 group = 'io.github.weavemc'
-version = '1.0.0+build.unknown'
+version = '1.0.1+build.unknown'
 def ENV = System.getenv()
 if (ENV.BUILD_NUMBER) {
-	version = "1.0.0+build.${ENV.BUILD_NUMBER}"
+	version = "1.0.1+build.${ENV.BUILD_NUMBER}"
 }
 
 repositories {
