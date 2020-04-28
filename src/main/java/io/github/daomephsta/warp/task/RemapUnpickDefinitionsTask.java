@@ -1,9 +1,8 @@
 package io.github.daomephsta.warp.task;
 
-import static java.util.stream.Collectors.toMap;
-
 import java.io.*;
 import java.nio.file.*;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
@@ -16,11 +15,13 @@ import io.github.daomephsta.warp.WarpPlugin;
 import io.github.daomephsta.warp.extension.WarpExtension;
 import net.fabricmc.loom.LoomGradleExtension;
 import net.fabricmc.loom.providers.MappingsProvider;
-import net.fabricmc.mappings.EntryTriple;
-import net.fabricmc.mappings.Mappings;
+import net.fabricmc.mapping.tree.*;
 
 public class RemapUnpickDefinitionsTask extends DefaultTask
 {	
+	private static final String OBF_NAMESPACE = "official";
+	private static final String HUMAN_NAMESPACE = "named";
+
 	@TaskAction
 	public void doTask() throws IOException 
 	{
@@ -36,14 +37,19 @@ public class RemapUnpickDefinitionsTask extends DefaultTask
 		if (Files.exists(destination))
 			return;
 		
-		Mappings mappings = getMappings(mappingsProvider);
-		Map<String, String> classMappings = mappings.getClassEntries().stream().collect(toMap(ce -> ce.get("official"), ce -> ce.get("named")));
-		Map<MethodKey, String> methodMappings = mappings.getMethodEntries().stream().collect(toMap(me -> 
+		TinyTree mappings = getMappings(mappingsProvider);
+		Map<String, String> classMappings = new HashMap<>();
+		Map<MethodKey, String> methodMappings = new HashMap<>();
+		for (ClassDef classDef : mappings.getClasses())
 		{
-			EntryTriple methodInfo = me.get("official");
-			return new MethodKey(methodInfo.getOwner(), methodInfo.getName(), methodInfo.getDesc());
-		}, 
-		me -> me.get("named").getName()));
+			String officialClassName = classDef.getName(OBF_NAMESPACE);
+			classMappings.put(officialClassName, classDef.getName(HUMAN_NAMESPACE));
+			for (MethodDef methodDef : classDef.getMethods())
+			{
+				MethodKey key = new MethodKey(officialClassName, methodDef.getName(OBF_NAMESPACE), methodDef.getDescriptor(OBF_NAMESPACE));
+				methodMappings.put(key, methodDef.getName(HUMAN_NAMESPACE));
+			}
+		}
 		Files.createDirectories(destination);
 		
 		//Generate remapped files
@@ -64,7 +70,7 @@ public class RemapUnpickDefinitionsTask extends DefaultTask
 		}
 	}
 	
-	private static Mappings getMappings(MappingsProvider mappingsProvider)
+	private static TinyTree getMappings(MappingsProvider mappingsProvider)
 	{
 		try
 		{

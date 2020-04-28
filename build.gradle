@@ -1,6 +1,7 @@
 plugins {
     id 'java-gradle-plugin'
     id 'maven-publish'
+    id 'eclipse'
 }
 
 archivesBaseName = 'warp'
@@ -20,8 +21,8 @@ repositories {
 }
 
 dependencies {
-	implementation 'net.fabricmc:fabric-loom:0.2.5-SNAPSHOT'
-	implementation 'net.fabricmc:tiny-mappings-parser:0.1.1.8'
+	implementation 'net.fabricmc:fabric-loom:0.2.7-SNAPSHOT'
+	implementation 'net.fabricmc:tiny-mappings-parser:0.2.1.13'
 	implementation 'commons-io:commons-io:2.6'
 	implementation 'com.google.guava:guava:28.0-jre'
 	implementation 'io.github.weavemc:unpick-format-utils:2.0.0+build.1'
