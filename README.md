@@ -18,7 +18,7 @@ Note that the number before the + is the target Minecraft version.
 
 To use other sets of Unpick definitions, see their documentation.
 #### Running Warp
-Warp automatically runs when Loom's genSources task does
+Warp automatically runs when Loom's genSources task does. Once the Gradle run is complete, it may be necessary to close and reopen your project to refresh the sources. 
 
 ### Discord
 If you need support with any WeaveMC project, you can find it [here](https://discordapp.com/invite/NSUCTCK).
