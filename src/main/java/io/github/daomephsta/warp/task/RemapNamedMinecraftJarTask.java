@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Enumeration;
 import java.util.jar.*;
+import java.util.logging.*;
 
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.DefaultTask;
@@ -30,6 +31,9 @@ public class RemapNamedMinecraftJarTask extends DefaultTask
 	@TaskAction
 	private void remapJar()
 	{
+		//Configure logger first, so it's configured when any unpick class accesses it
+		File logFile = new File(getProject().getBuildDir(), "logs/warp/unpick.log");
+		configureLogger(logFile);
 		try
 		{
 			WarpExtension warpExtension = WarpExtension.get(getProject());
@@ -39,7 +43,6 @@ public class RemapNamedMinecraftJarTask extends DefaultTask
 				.filter(p -> p.toString().endsWith(".unpick"))
 				.map(this::openPath)
 				.toArray(InputStream[]::new);
-			File logFile = new File(getProject().getBuildDir(), "logs/warp/unpick.log");
 			logFile.getParentFile().mkdirs();
 			Iterable<File> methodOwnerSources = getProject().getConfigurations().getByName(Constants.MINECRAFT_DEPENDENCIES)
 					.plus(getProject().files(loomExtension.getMinecraftMappedProvider().getMappedJar()))
@@ -47,8 +50,7 @@ public class RemapNamedMinecraftJarTask extends DefaultTask
 			IClassResolver methodOwnerResolver = new JarClassResolver(methodOwnerSources);
 			IClassResolver constantClassResolver = new JarClassResolver(getProject().getConfigurations().getByName(WarpConfigurations.UNPICK_CONSTANT_SOURCE));
 			ConstantUninliner uninliner = new ConstantUninliner(ConstantMappers.dataDriven(methodOwnerResolver, unpickDefinitions), 
-					ConstantResolvers.bytecodeAnalysis(constantClassResolver), 
-					logFile.getPath());
+					ConstantResolvers.bytecodeAnalysis(constantClassResolver), Logger.getLogger("unpick"));
 			File mappedJar = loomExtension.getMinecraftMappedProvider().getMappedJar();
 			//Make copy of mapped jar pre-unpicking
 			File inlinedMappedJar = new File(getProject().getBuildDir(), "tmp/warp/inlined/" + mappedJar.getName());
@@ -103,6 +105,31 @@ public class RemapNamedMinecraftJarTask extends DefaultTask
 		catch (IOException e)
 		{
 			throw new RuntimeException(e);
+		}
+	}
+	
+	private void configureLogger(File logFile)
+	{
+		try
+		{
+			Logger logger = Logger.getLogger("unpick");
+			logger.setUseParentHandlers(false);
+			FileHandler fileHandler = new FileHandler(logFile.getPath());
+			Formatter formatter = new Formatter()
+			{
+				@Override
+				public String format(LogRecord record)
+				{
+					return record.getLevel() + ": " + String.format(record.getMessage(), record.getParameters()) + System.lineSeparator();
+				}
+			};
+			fileHandler.setFormatter(formatter);
+			logger.addHandler(fileHandler);
+		} 
+		catch (SecurityException | IOException e)
+		{
+			System.err.println("Failed to configure unpick logger");
+			System.err.println(e);
 		}
 	}
 }
