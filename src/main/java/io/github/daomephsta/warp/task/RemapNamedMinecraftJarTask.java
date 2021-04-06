@@ -50,7 +50,7 @@ public class RemapNamedMinecraftJarTask extends DefaultTask
 			IClassResolver methodOwnerResolver = new JarClassResolver(methodOwnerSources);
 			IClassResolver constantClassResolver = new JarClassResolver(getProject().getConfigurations().getByName(WarpConfigurations.UNPICK_CONSTANT_SOURCE));
 			ConstantUninliner uninliner = new ConstantUninliner(ConstantMappers.dataDriven(methodOwnerResolver, unpickDefinitions), 
-					ConstantResolvers.bytecodeAnalysis(constantClassResolver), Logger.getLogger("unpick"));
+					ConstantResolvers.bytecodeAnalysis(constantClassResolver), logFile.getPath());
 			File mappedJar = loomExtension.getMinecraftMappedProvider().getMappedJar();
 			//Make copy of mapped jar pre-unpicking
 			File inlinedMappedJar = new File(getProject().getBuildDir(), "tmp/warp/inlined/" + mappedJar.getName());

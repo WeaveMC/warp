@@ -26,10 +26,9 @@ public class WarpPlugin implements Plugin<Project>
     private void afterProjectEvaluation(Project project)
     {
     	TaskContainer tasks = project.getTasks();
-		Task genSourcesDecompile = tasks.getByName("genSourcesDecompile");
 		Task genSources = tasks.getByName("genSources");
 		
-		genSourcesDecompile.dependsOn(WarpTasks.REMAP_NAMED_MC_JAR);
+		genSources.dependsOn(WarpTasks.REMAP_NAMED_MC_JAR);
 		genSources.doLast(t -> 
 		{
 			try
